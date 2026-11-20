@@ -47,6 +47,7 @@ button { font: inherit; }
 .brand { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 19px; letter-spacing: -0.02em; }
 .brand .mark { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: #fff; }
 .brand svg { width: 17px; height: 17px; fill: var(--a2); }
+.brand .logo { display: block; height: 32px; width: auto; }
 .msg {
   display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 99px;
   border: 1px solid rgba(255, 255, 255, 0.22); background: rgba(255, 255, 255, 0.08);
