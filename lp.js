@@ -6,13 +6,15 @@
  * message reads "I confirm my order: <plan and price>. I will pay by <method>." The only other way to
  * WhatsApp is the small "Message us" link (<a data-wa="message">) in the header.
  * TikTok gets AddToCart when Continue is tapped, InitiateCheckout (with the price) when the order is
- * confirmed, and ClickButton for any tap that opens WhatsApp.
+ * confirmed, and ClickButton for any tap that opens WhatsApp. The Meta pixel gets the same three steps
+ * (AddToCart, InitiateCheckout, Contact) plus PageView, with the same event ids as the backend.
  *
  * Every visitor gets a short ref code (G... on the ChatGPT page, A... on the Anghami page). The code is
- *   1. sent to the backend (lp_click) together with the ad click id from the URL (?ttclid=...), and
+ *   1. sent to the backend (lp_click) together with the ad click id from the URL (?ttclid=... from
+ *      TikTok, ?fbclid=... from Meta), and
  *   2. added to the prefilled WhatsApp message as "Ref: <code>".
  * When the customer sends that message, the backend ties their phone number to the ad click, so the lead
- * and a later sale are reported to TikTok with the click id.
+ * and a later sale are reported to TikTok and Meta with the click id.
  *
  * The page needs:
  *   <body data-product="gpt|anghami" data-name="ChatGPT+">
@@ -26,6 +28,7 @@
 
   var ENDPOINT = 'https://kfgswynickhywzhneltu.supabase.co/functions/v1/lp_click';
   var WHATSAPP = '96176970994';
+  var META_PIXEL = '1629320494505137';
   var LETTER = { gpt: 'G', anghami: 'A' };
   var ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // no 0, 1, I, O
   var KEEP_DAYS = 7; // a returning visitor keeps their code this long, unless they arrive from a new ad click
@@ -58,13 +61,24 @@
 
   // The visitor's code: reuse the stored one, except when it is old or this is a different ad click
   var urlClick = query.get('ttclid');
+  var urlFb = query.get('fbclid'); // Meta's click id, case sensitive: kept exactly as it arrived
   var saved = load();
   var fresh = saved && saved.code && Date.now() - saved.t < KEEP_DAYS * 864e5;
-  if (!fresh || (urlClick && urlClick !== saved.ttclid)) {
-    saved = { code: newCode(), ttclid: urlClick || null, t: Date.now() };
+  if (!fresh || (urlClick && urlClick !== saved.ttclid) || (urlFb && urlFb !== saved.fbclid)) {
+    saved = {
+      code: newCode(), ttclid: urlClick || null, t: Date.now(),
+      fbclid: urlFb || null, fbc: urlFb ? 'fb.1.' + Date.now() + '.' + urlFb : null // Meta's click id format
+    };
     save(saved);
   }
   var code = saved.code;
+
+  // Meta pixel: the page's <head> loads it; it starts here so it can carry the ref code as the visitor id
+  function fb() {
+    try { if (window.fbq) window.fbq.apply(null, arguments); } catch (err) { /* ignore */ }
+  }
+  fb('init', META_PIXEL, { external_id: code });
+  fb('track', 'PageView');
 
   var params = {};
   KEPT_PARAMS.forEach(function (k) { if (query.get(k)) params[k] = query.get(k); });
@@ -77,6 +91,8 @@
       plan: extra && extra.plan,
       ttclid: saved.ttclid,
       ttp: cookie('_ttp'), // set by the TikTok pixel
+      fbc: saved.fbc || cookie('_fbc'),
+      fbp: cookie('_fbp'), // set by the Meta pixel
       url: location.href.slice(0, 1000),
       referrer: document.referrer.slice(0, 1000),
       params: params
@@ -98,6 +114,7 @@
   function tapped() {
     report('click');
     track('ClickButton', { content_type: 'product', content_id: product + '_whatsapp_button' }, 'click_' + code);
+    fb('track', 'Contact', { content_name: product + ' WhatsApp button' }, { eventID: 'click_' + code });
   }
 
   // ---- the small "Message us" escape: <a data-wa="message"> ----
@@ -152,6 +169,7 @@
       refresh();
       sheet.hidden = false;
       track('AddToCart', { content_type: 'product', content_id: product, content_name: order.plan, value: order.value, currency: 'USD' }, 'cart_' + code);
+      fb('track', 'AddToCart', { content_type: 'product', content_ids: [product], content_name: order.plan, value: order.value, currency: 'USD' }, { eventID: 'cart_' + code });
       report('cart', { value: order.value, plan: order.plan }); // the server repeats it with the click id, same event id
     });
   }
@@ -168,6 +186,7 @@
     tapped();
     // the strong signal: plan, price and payment method are all confirmed
     track('InitiateCheckout', { content_type: 'product', content_id: product, content_name: order.plan, value: order.value, currency: 'USD' }, 'order_' + code);
+    fb('track', 'InitiateCheckout', { content_type: 'product', content_ids: [product], content_name: order.plan, value: order.value, currency: 'USD' }, { eventID: 'order_' + code });
     report('order', { value: order.value, plan: order.plan });
   });
 
