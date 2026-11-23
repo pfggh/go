@@ -75,7 +75,8 @@
 
   // Meta pixel: the page's <head> loads it; it starts here so it can carry the ref code as the visitor id
   function fb() {
-    try { if (window.fbq) window.fbq.apply(null, arguments); } catch (err) { /* ignore */ }
+    // Meta browser pixel OFF since 2026-11-23 (owner); the loader in the page head is commented out too.
+    // try { if (window.fbq) window.fbq.apply(null, arguments); } catch (err) { /* ignore */ }
   }
   fb('init', META_PIXEL, { external_id: code });
   fb('track', 'PageView');
