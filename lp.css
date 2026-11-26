@@ -150,6 +150,30 @@ main > h2 { margin-top: 34px; font-size: 21px; font-weight: 800; letter-spacing:
 .faq p { padding: 0 16px 16px; color: var(--muted); font-size: 15px; }
 
 footer { margin-top: 30px; color: var(--muted); font-size: 12.5px; text-align: center; }
+/* business details, disclaimer and policy links: TikTok asks for them on every landing page */
+footer.site { margin-top: 36px; padding: 18px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; font-size: 13px; line-height: 1.55; }
+footer.site p + p { margin-top: 4px; }
+footer.site b { color: var(--text); }
+footer.site a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+footer.site .disclaimer { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+footer.site nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 16px; margin: 10px 0 6px; font-weight: 700; }
+.faq p a { color: var(--accent); }
+.hero .who { margin-top: 6px; font-size: 13.5px; color: rgba(255, 255, 255, 0.72); }
+.product { font-size: 13.5px; font-weight: 600; letter-spacing: 0.01em; }
+
+/* ---- policy pages (terms, privacy, refund) ---- */
+.legal-hero { padding-bottom: 28px; }
+.legal-hero h1 { font-size: 32px; margin-top: 26px; }
+.legal-hero .lead { font-size: 15px; }
+.legal { margin-top: 18px; padding: 20px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 20px; }
+.legal h2 { margin-top: 22px; font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
+.legal h2:first-child { margin-top: 0; }
+.legal p, .legal li { margin-top: 8px; color: var(--muted); font-size: 15px; }
+.legal ul { padding-left: 20px; }
+.legal b { color: var(--text); }
+.legal a { color: var(--accent); }
+.back-link { display: inline-block; margin-top: 18px; color: var(--accent); font-weight: 700; text-decoration: none; }
+body.page-legal { padding-bottom: 24px; }
 
 /* ---- services list ---- */
 .list.services { padding: 6px 4px; }
