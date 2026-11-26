@@ -37,6 +37,8 @@
   var product = document.body.getAttribute('data-product');
   var letter = LETTER[product];
   if (!letter) return;
+  // neutral id for the ad pixels: no brand names in what TikTok/Meta receive (owner, 2026-11-27)
+  var PIXEL_ID = { gpt: 'ai', anghami: 'music' }[product] || 'plan';
 
   var query = new URLSearchParams(location.search);
   var storeKey = 'teshrij_ref_' + product;
@@ -114,8 +116,8 @@
   // Any tap that opens WhatsApp. Same event id as the backend's ClickButton, so TikTok counts it once.
   function tapped() {
     report('click');
-    track('ClickButton', { content_type: 'product', content_id: product + '_whatsapp_button' }, 'click_' + code);
-    fb('track', 'Contact', { content_name: product + ' WhatsApp button' }, { eventID: 'click_' + code });
+    track('ClickButton', { content_type: 'product', content_id: PIXEL_ID + '_whatsapp_button' }, 'click_' + code);
+    fb('track', 'Contact', { content_name: PIXEL_ID + ' WhatsApp button' }, { eventID: 'click_' + code });
   }
 
   // ---- the small "Message us" escape: <a data-wa="message"> ----
@@ -169,8 +171,8 @@
       document.getElementById('s-price').textContent = '$' + order.value;
       refresh();
       sheet.hidden = false;
-      track('AddToCart', { content_type: 'product', content_id: product, content_name: order.plan, value: order.value, currency: 'USD' }, 'cart_' + code);
-      fb('track', 'AddToCart', { content_type: 'product', content_ids: [product], content_name: order.plan, value: order.value, currency: 'USD' }, { eventID: 'cart_' + code });
+      track('AddToCart', { content_type: 'product', content_id: PIXEL_ID, content_name: order.plan, value: order.value, currency: 'USD' }, 'cart_' + code);
+      fb('track', 'AddToCart', { content_type: 'product', content_ids: [PIXEL_ID], content_name: order.plan, value: order.value, currency: 'USD' }, { eventID: 'cart_' + code });
       report('cart', { value: order.value, plan: order.plan }); // the server repeats it with the click id, same event id
     });
   }
@@ -186,8 +188,8 @@
     }
     tapped();
     // the strong signal: plan, price and payment method are all confirmed
-    track('InitiateCheckout', { content_type: 'product', content_id: product, content_name: order.plan, value: order.value, currency: 'USD' }, 'order_' + code);
-    fb('track', 'InitiateCheckout', { content_type: 'product', content_ids: [product], content_name: order.plan, value: order.value, currency: 'USD' }, { eventID: 'order_' + code });
+    track('InitiateCheckout', { content_type: 'product', content_id: PIXEL_ID, content_name: order.plan, value: order.value, currency: 'USD' }, 'order_' + code);
+    fb('track', 'InitiateCheckout', { content_type: 'product', content_ids: [PIXEL_ID], content_name: order.plan, value: order.value, currency: 'USD' }, { eventID: 'order_' + code });
     report('order', { value: order.value, plan: order.plan });
   });
 

@@ -77,6 +77,13 @@
   var pages = document.querySelectorAll('a[data-page]');
   for (var p = 0; p < pages.length; p++) pages[p].href = pages[p].getAttribute('href') + onwardQuery;
 
+  // neutral ids for the ad pixels: no brand names in what TikTok/Meta receive (owner, 2026-11-27)
+  var PIXEL_IDS = { chatgpt: 'ai', gemini: 'ai2', anghami: 'music', spotify: 'music2', netflix: 'stream',
+    shahid: 'stream2', osn: 'stream3', disney: 'stream4', canva: 'design', adobe: 'design2', autodesk: 'design3' };
+  function pixelId(service) {
+    return PIXEL_IDS[service.toLowerCase().replace(/\W+/g, '')] || 'other';
+  }
+
   // ---- step 1: a WhatsApp row opens the confirm sheet ----
   var sheet = document.getElementById('sheet');
   var send = document.getElementById('send');
@@ -87,8 +94,9 @@
       document.getElementById('s-title').textContent = service;
       send.href = waLink(this.getAttribute('data-wa'));
       sheet.hidden = false;
-      track('ViewContent', { content_type: 'product', content_id: 'services_' + service.toLowerCase().replace(/\W+/g, '') }, 'view_' + service.toLowerCase().replace(/\W+/g, '') + '_' + code);
-      fb('track', 'ViewContent', { content_type: 'product', content_ids: ['services_' + service.toLowerCase().replace(/\W+/g, '')], content_name: service }, { eventID: 'view_' + service.toLowerCase().replace(/\W+/g, '') + '_' + code });
+      var pid = pixelId(service);
+      track('ViewContent', { content_type: 'product', content_id: 'services_' + pid }, 'view_' + pid + '_' + code);
+      fb('track', 'ViewContent', { content_type: 'product', content_ids: ['services_' + pid], content_name: 'services ' + pid }, { eventID: 'view_' + pid + '_' + code });
     });
   }
 
