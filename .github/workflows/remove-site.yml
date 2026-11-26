@@ -1,0 +1,38 @@
+# Takes teshrij.xyz/go down on 4 Dec 2026, 09:00 Beirut (07:00 UTC). The pages moved to teshrij.com
+# (repo pfggh/teshrij.com). Deletes every site file, asks Pages to rebuild, then disables this workflow.
+# Manual run: Actions > "Remove landing pages" > Run workflow (dry_run=true only shows what would go).
+name: Remove landing pages
+on:
+  schedule:
+    - cron: "0 7 4 12 *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Only list what would be removed"
+        type: boolean
+        default: true
+permissions:
+  contents: write
+  pages: write
+  actions: write
+jobs:
+  remove:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove site files
+        env:
+          DRY: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$DRY" != "true" ] && [ "$(date -u +%Y%m%d)" -lt 20261204 ]; then echo "Too early, nothing done"; exit 0; fi
+          files=$(git ls-files | grep -v '^\.github/')
+          echo "Files to remove:"; echo "$files"
+          if [ "$DRY" = "true" ]; then echo "Dry run: nothing removed"; exit 0; fi
+          [ -z "$files" ] && { echo "Already removed"; exit 0; }
+          echo "$files" | xargs git rm -q
+          git -c user.name="github-actions[bot]" -c user.email="41898699+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Remove landing pages (moved to teshrij.com)"
+          git push
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" || echo "Pages build request failed; the push should still rebuild"
+          gh workflow disable remove-site.yml --repo "$GITHUB_REPOSITORY" || true
