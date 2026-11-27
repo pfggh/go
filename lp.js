@@ -3,10 +3,10 @@
  *
  * Ordering is locked in: the visitor picks a plan (one is chosen from the start), taps Continue, and
  * gets a confirmation sheet; the order goes to WhatsApp only after they pick Whish or USDT, and the
- * message reads "I confirm my order: <plan and price>. I will pay by <method>." The only other way to
+ * message reads "I'd like to order <plan and price>. I'll pay by <method>." (autoreply.rules order_*_v2). The only other way to
  * WhatsApp is the small "Message us" link (<a data-wa="message">) in the header.
  * TikTok gets AddToCart when Continue is tapped, InitiateCheckout (with the price) when the order is
- * confirmed, and ClickButton for any tap that opens WhatsApp. The Meta pixel gets the same three steps
+ * confirmed, and ClickButton for any tap that opens WhatsApp. The Meta pixel is off (since 2026-11-23); these steps go to TikTok only
  * (AddToCart, InitiateCheckout, Contact) plus PageView, with the same event ids as the backend.
  *
  * Every visitor gets a short ref code (G... on the ChatGPT page, A... on the Anghami page). The code is
@@ -37,7 +37,7 @@
   var product = document.body.getAttribute('data-product');
   var letter = LETTER[product];
   if (!letter) return;
-  // neutral id for the ad pixels: no brand names in what TikTok/Meta receive (owner, 2026-11-27)
+  // short content id for pixel reports
   var PIXEL_ID = { gpt: 'ai', anghami: 'music' }[product] || 'plan';
 
   var query = new URLSearchParams(location.search);
@@ -155,11 +155,11 @@
     for (var k = 0; k < payInputs.length; k++) if (payInputs[k].checked) pay = payInputs[k].value;
     send.classList.toggle('off', !pay);
     if (pay) {
-      send.href = waLink('Hello! I confirm my order: ' + order.item + '. I will pay by ' + pay + '.');
+      send.href = waLink('Hello! I\'d like to order ' + order.item + '. I\'ll pay by ' + pay + '.');
       agree.textContent = 'We send you the ' + pay + ' payment details on WhatsApp.';
     } else {
       send.removeAttribute('href'); // not a link until the order can be sent with its ref code
-      agree.textContent = 'Choose Whish or USDT to confirm your order.';
+      agree.textContent = 'Choose Whish or USDT to continue.';
     }
   }
   for (var p = 0; p < payInputs.length; p++) payInputs[p].addEventListener('change', refresh);

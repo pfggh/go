@@ -15,12 +15,12 @@
 }
 /* one clear colour per page for the hero; green for the action, yellow for the price, on every page */
 .theme-gpt { --a1: #1a7bff; --a2: #0a45c9; --accent: #0f71f2; --tint: rgba(15, 113, 242, 0.08); }
-.theme-anghami { --a1: #8a3ffc; --a2: #5b1fd1; --accent: #7b2ff7; --tint: rgba(123, 47, 247, 0.08); }
+.theme-anghami { --a1: #1a7bff; --a2: #0a45c9; --accent: #0f71f2; --tint: rgba(15, 113, 242, 0.08); } /* Teshrij blue, same as the other pages */
 
 @media (prefers-color-scheme: dark) {
   :root { --bg: #070a13; --card: #121a2c; --text: #f3f5fa; --muted: #98a2b7; --line: #25304a; --good: #3ddc84; --shadow: 0 18px 40px rgba(0, 0, 0, 0.45); }
   .theme-gpt { --accent: #5aa2ff; --tint: rgba(90, 162, 255, 0.14); }
-  .theme-anghami { --accent: #b68cff; --tint: rgba(182, 140, 255, 0.14); }
+  .theme-anghami { --accent: #5aa2ff; --tint: rgba(90, 162, 255, 0.14); }
 }
 
 * { box-sizing: border-box; margin: 0; -webkit-tap-highlight-color: transparent; }
@@ -225,3 +225,8 @@ body.page-legal { padding-bottom: 24px; }
   * { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
 }
+
+/* small print: review note, terms line on the confirm sheet */
+.fine { font-size: 13px; line-height: 1.45; color: #6b7280; margin: -6px 0 14px; }
+.sheet-card .fine { margin: 10px 0 0; text-align: center; }
+.fine a { color: inherit; text-decoration: underline; }
